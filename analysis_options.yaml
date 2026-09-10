@@ -1,1 +1,11 @@
 include: package:flutter_lints/flutter.yaml
+
+formatter:
+  trailing_commas: preserve
+
+analyzer:
+  exclude: 
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/example/**"
+    

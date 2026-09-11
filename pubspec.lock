@@ -185,10 +185,9 @@ packages:
   flutter_html_latex:
     dependency: "direct main"
     description:
-      name: flutter_html_latex
-      sha256: "212a28b7c4cbe9e0a215c8f9aa0f2f723ef92a1d6ce5db665fb6affc58437841"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/flutter_html_latex-0.1.0+1"
+      relative: true
+    source: path
     version: "0.1.0+1"
   flutter_lints:
     dependency: "direct dev"

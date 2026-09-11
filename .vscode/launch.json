@@ -9,10 +9,11 @@
             "name": "Web demo_tex_native",
             "request": "launch",
             "type": "dart",
-            "program": "lib/main.dart",
+            "program": "lib/test_preview_latex.dart",
             "args": [
                 "-d",
-                "chrome"
+                "chrome",
+                "--web-port", "8888"
             ]
         },
         {

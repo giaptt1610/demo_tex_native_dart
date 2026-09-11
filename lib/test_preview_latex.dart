@@ -1,13 +1,7 @@
 import 'package:demo_tex_native/injector.dart';
-import 'package:demo_tex_native/my_service.dart';
 import 'package:demo_tex_native/ocr_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:flutter_markdown_plus_latex/flutter_markdown_plus_latex.dart';
 import 'package:get/get.dart';
-import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
-import 'package:flutter_tex/flutter_tex.dart';
-import 'package:markdown/markdown.dart' as md;
 import 'markdown_to_html.dart';
 import 'models/source_preview_result.dart';
 import 'package:flutter_html_latex/flutter_html_latex.dart';
@@ -57,7 +51,7 @@ class _PreviewLatexState extends State<PreviewLatex> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    inputController.text = '25592143';
+    inputController.text = '25592141';
     sourceId.value = int.tryParse(inputController.text.trim()) ?? 0;
     getSourcePreview();
   }
@@ -66,6 +60,7 @@ class _PreviewLatexState extends State<PreviewLatex> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        padding: EdgeInsets.all(20.0),
         child: Column(
           children: [
             Container(
@@ -105,7 +100,7 @@ class _PreviewLatexState extends State<PreviewLatex> {
                 if (result == null) {
                   return Text('No preview available');
                 }
-                return _markdownItem(result.rawMarkdown);
+                return SingleChildScrollView(child: _markdownItem(result.rawMarkdown));
               }),
             ),
           ],
@@ -132,10 +127,9 @@ class _PreviewLatexState extends State<PreviewLatex> {
   }
 
   Widget _markdownItem(String? rawMarkdown) {
-    final html = convertMarkdownToHtml(rawMarkdown ?? '');
+    final html = convertMarkdownToHtmlLatex(rawMarkdown ?? '');
     print('--- html:$html ');
     return HtmlLatex(
-      // rawMarkdown ?? '',
       html,
       style: TextStyle(
         fontSize: 16.0,

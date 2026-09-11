@@ -1,120 +1,97 @@
 import 'package:markdown/markdown.dart' as md;
 
 String convertMarkdownToHtml(String markdown) {
+  return _convertMarkdownToHtml(
+    markdown,
+    mathBuilder: _buildPlainMathHtml,
+  );
+}
+
+String convertMarkdownToHtmlLatex(String markdown) {
+  return _convertMarkdownToHtml(
+    markdown,
+    mathBuilder: _buildHtmlLatexMathHtml,
+  );
+}
+
+String _convertMarkdownToHtml(
+  String markdown, {
+  required String Function(_MathExpression expression) mathBuilder,
+}) {
   final mathExpressions = <_MathExpression>[];
   final codeBlocks = <String>[];
 
   var text = markdown;
-
-  // ============================================================
-  // 0. Escape leading "N)"/"N." so they aren't parsed as ordered-list markers
-  // ============================================================
 
   text = text.replaceAllMapped(
     RegExp(r'^(\s*)(\d+)([.)])(\s)', multiLine: true),
     (match) => '${match.group(1)}${match.group(2)}\\${match.group(3)}${match.group(4)}',
   );
 
-  // ============================================================
-  // 1. Protect fenced code blocks
-  // ============================================================
-
   text = text.replaceAllMapped(
     RegExp(r'```[\s\S]*?```'),
     (match) {
       final index = codeBlocks.length;
-
       codeBlocks.add(match.group(0)!);
-
       return 'CODEBLOCK${index}XYZ';
     },
   );
-
-  // ============================================================
-  // 2. Extract $$ ... $$ block math
-  // ============================================================
 
   text = text.replaceAllMapped(
     RegExp(r'\$\$([\s\S]*?)\$\$'),
     (match) {
       final index = mathExpressions.length;
-
       mathExpressions.add(
         _MathExpression(
           latex: match.group(1)!.trim(),
           isBlock: true,
         ),
       );
-
       return '\n\nMATHBLOCK${index}XYZ\n\n';
     },
   );
-
-  // ============================================================
-  // 3. Extract \[ ... \] block math
-  // ============================================================
 
   text = text.replaceAllMapped(
     RegExp(r'\\\[([\s\S]*?)\\\]'),
     (match) {
       final index = mathExpressions.length;
-
       mathExpressions.add(
         _MathExpression(
           latex: match.group(1)!.trim(),
           isBlock: true,
         ),
       );
-
       return '\n\nMATHBLOCK${index}XYZ\n\n';
     },
   );
 
-  // ============================================================
-  // 4. Extract $ ... $ inline math
-  // ============================================================
-
   text = text.replaceAllMapped(
-    RegExp(
-      r'(?<!\$)\$(?!\$)([\s\S]*?)(?<!\$)\$(?!\$)',
-    ),
+    RegExp(r'(?<!\$)\$(?!\$)([\s\S]*?)(?<!\$)\$(?!\$)'),
     (match) {
       final index = mathExpressions.length;
-
       mathExpressions.add(
         _MathExpression(
           latex: match.group(1)!.trim(),
           isBlock: false,
         ),
       );
-
       return 'MATHINLINE${index}XYZ';
     },
   );
-
-  // ============================================================
-  // 5. Extract \( ... \) inline math
-  // ============================================================
 
   text = text.replaceAllMapped(
     RegExp(r'\\\(([\s\S]*?)\\\)'),
     (match) {
       final index = mathExpressions.length;
-
       mathExpressions.add(
         _MathExpression(
           latex: match.group(1)!.trim(),
           isBlock: false,
         ),
       );
-
       return 'MATHINLINE${index}XYZ';
     },
   );
-
-  // ============================================================
-  // 6. Markdown -> HTML
-  // ============================================================
 
   var html = md.markdownToHtml(
     text,
@@ -122,26 +99,17 @@ String convertMarkdownToHtml(String markdown) {
     encodeHtml: false,
   );
 
-  // ============================================================
-  // 7. Restore math
-  // ============================================================
+  html = _unwrapStandaloneBlockMathPlaceholders(html);
 
   for (var i = 0; i < mathExpressions.length; i++) {
     final expression = mathExpressions[i];
-
     final placeholder = expression.isBlock ? 'MATHBLOCK${i}XYZ' : 'MATHINLINE${i}XYZ';
-
-    final replacement = expression.isBlock ? '\\[${expression.latex}\\]' : '\\(${expression.latex}\\)';
 
     html = html.replaceAll(
       placeholder,
-      replacement,
+      mathBuilder(expression),
     );
   }
-
-  // ============================================================
-  // 8. Restore code blocks
-  // ============================================================
 
   for (var i = 0; i < codeBlocks.length; i++) {
     html = html.replaceAll(
@@ -150,58 +118,93 @@ String convertMarkdownToHtml(String markdown) {
     );
   }
 
-  // ============================================================
-  // 9. Preserve newlines
-  // ============================================================
+  return _preserveNewLines(html);
+}
 
-  html = _preserveNewLines(html);
+String _buildPlainMathHtml(_MathExpression expression) {
+  final escapedLatex = _escapeHtmlText(expression.latex);
+  if (expression.isBlock) {
+    return '\\[$escapedLatex\\]';
+  }
 
-  return html;
+  return '\\($escapedLatex\\)';
+}
+
+String _buildHtmlLatexMathHtml(_MathExpression expression) {
+  final escapedLatex = _escapeHtmlText(expression.latex);
+  if (expression.isBlock) {
+    return '<div class="math-display">\\[$escapedLatex\\]</div>';
+  }
+
+  return '<span class="math-inline">\\($escapedLatex\\)</span>';
+}
+
+String _escapeHtmlText(String text) {
+  return text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+}
+
+String _unwrapStandaloneBlockMathPlaceholders(String html) {
+  return html.replaceAllMapped(
+    RegExp(r'<p>\s*(MATHBLOCK\d+XYZ)\s*</p>', caseSensitive: false),
+    (match) => match.group(1) ?? '',
+  );
 }
 
 String _preserveNewLines(String html) {
-  // Không xử lý newline bên trong:
-  // <pre>...</pre>
-  // <code>...</code>
-  // <style>...</style>
-  // <script>...</script>
-
   final protected = <String>[];
 
-  html = html.replaceAllMapped(
+  String protectMatches(String input, RegExp pattern) {
+    return input.replaceAllMapped(pattern, (match) {
+      final index = protected.length;
+      protected.add(match.group(0)!);
+      return 'PROTECTED${index}XYZ';
+    });
+  }
+
+  html = protectMatches(
+    html,
     RegExp(
-      r'<(pre|code|style|script|table)\b[^>]*>[\s\S]*?</\1>',
+      r'<(pre|code|style|script|table|math)\b[^>]*>[\s\S]*?</\1>',
       caseSensitive: false,
     ),
-    (match) {
-      final index = protected.length;
-
-      protected.add(match.group(0)!);
-
-      return 'PROTECTED${index}XYZ';
-    },
   );
 
-  // Newline còn lại trong HTML -> <br>
+  html = protectMatches(
+    html,
+    RegExp(
+      r'<(span|div)\b[^>]*class="[^"]*\bmath-(?:tex|inline|display)\b[^"]*"[^>]*>[\s\S]*?</\1>',
+      caseSensitive: false,
+    ),
+  );
+
+  html = protectMatches(
+    html,
+    RegExp(
+      r"<(span|div)\b[^>]*class='[^']*\bmath-(?:tex|inline|display)\b[^']*'[^>]*>[\s\S]*?</\1>",
+      caseSensitive: false,
+    ),
+  );
+
+  html = protectMatches(
+    html,
+    RegExp(r'\\\[[\s\S]*?\\\]'),
+  );
+
   html = html.replaceAll('\n', '<br>');
 
-  // Restore
   for (var i = 0; i < protected.length; i++) {
-    html = html.replaceAll(
-      'PROTECTED${i}XYZ',
-      protected[i],
-    );
+    html = html.replaceAll('PROTECTED${i}XYZ', protected[i]);
   }
 
   return html;
 }
 
 class _MathExpression {
-  final String latex;
-  final bool isBlock;
-
   const _MathExpression({
     required this.latex,
     required this.isBlock,
   });
+
+  final String latex;
+  final bool isBlock;
 }

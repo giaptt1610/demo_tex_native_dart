@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'markdown_to_html.dart';
 import 'models/source_preview_result.dart';
 import 'package:flutter_html_latex/flutter_html_latex.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +29,9 @@ class TestPreviewLatex extends StatelessWidget {
           backgroundColor: Colors.blue,
 
           elevation: 0,
+        ),
+        textTheme: GoogleFonts.interTextTheme(
+          Theme.of(context).textTheme,
         ),
       ),
       home: PreviewLatex(),
@@ -85,7 +89,8 @@ class _PreviewLatexState extends State<PreviewLatex> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      sourceId.value = int.tryParse(inputController.text.trim()) ?? 0;
+                      sourceId.value =
+                          int.tryParse(inputController.text.trim()) ?? 0;
                       getSourcePreview();
                     },
                     child: Text('View'),
@@ -183,6 +188,8 @@ class _PreviewLatexState extends State<PreviewLatex> {
       ),
       mathJaxSupported: false,
       enableFallback: true,
+      primaryScaleInline: 1.18,
+      primaryScaleBlock: 1.0,
       // config: LatexHtmlWidgetFactoryConfig(
       //   baseFontSize: 16.0,
       // ),

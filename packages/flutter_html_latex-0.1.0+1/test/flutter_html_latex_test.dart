@@ -63,6 +63,29 @@ void main() {
     expect(math.options!.sizeUnderTextStyle, MathSize.normalsize);
   });
 
+  testWidgets('applies primary inline scale to Math.tex font size', (
+    tester,
+  ) async {
+    const html = '<span class="math-inline">\\(x+y\\)</span>';
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: HtmlLatex(
+            html,
+            style: TextStyle(fontSize: 20),
+            primaryScaleInline: 1.1,
+          ),
+        ),
+      ),
+    );
+
+    final math = tester.widget<Math>(find.byType(Math));
+    expect(math.options, isNotNull);
+    expect(math.options!.fontSize, 22);
+    expect(math.textStyle?.fontSize, 22);
+  });
+
   testWidgets('applies HtmlLatex text style to normal html text', (
     tester,
   ) async {

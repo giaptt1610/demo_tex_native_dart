@@ -132,15 +132,23 @@ HtmlLatex(
    - Enable horizontal scroll wrapper for wide equations
    - Default: `true`
 
-10. **`fallbackScaleInline`** (`double?`)
+10. **`primaryScaleInline`** (`double?`)
+    - Scale factor for inline equations rendered by `flutter_math_fork`
+    - Default: `1.0`
+
+11. **`primaryScaleBlock`** (`double?`)
+    - Scale factor for block equations rendered by `flutter_math_fork`
+    - Default: `1.0`
+
+12. **`fallbackScaleInline`** (`double?`)
     - Scale factor for inline fallback equations
     - Default: `0.86`
 
-11. **`fallbackScaleBlock`** (`double?`)
+13. **`fallbackScaleBlock`** (`double?`)
     - Scale factor for block fallback equations
     - Default: `0.92`
 
-12. **`fallbackVerticalPadding`** (`double?`)
+14. **`fallbackVerticalPadding`** (`double?`)
     - Vertical padding adjustment for fallback equations
     - Default: `2.0`
 
@@ -159,6 +167,8 @@ LatexHtmlWidgetFactoryConfig(
   enableFallback: true,
   mathJaxSupported: false,
   responsiveLayout: true,
+  primaryScaleInline: 1.0,
+  primaryScaleBlock: 1.0,
   fallbackScaleInline: 0.86,
   fallbackScaleBlock: 0.92,
   fallbackVerticalPadding: 2.0,

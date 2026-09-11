@@ -16,6 +16,7 @@ dependencies:
   #   path: ./packages/flutter_markdown_plus_latex-1.0.5
   
   # flutter_markdown_latex: ^0.3.4
+  google_fonts: ^8.2.1
   get: ^4.7.3
   http: ^1.6.0
   get_it: ^9.2.1

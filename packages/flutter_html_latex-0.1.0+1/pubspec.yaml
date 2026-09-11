@@ -11,9 +11,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_widget_from_html_core: ^0.17.0
-  flutter_math_fork: ^0.7.4
-  flutter_tex: ^5.2.6
+  flutter_widget_from_html_core: #^0.17.0
+    path: ./packages/flutter_widget_from_html_core-0.17.4
+  flutter_math_fork: #^0.7.4
+    path: ./packages/flutter_math_fork-0.7.4
+  flutter_tex: #^5.2.6
+    path: ./packages/flutter_tex-5.2.7
 
 
 

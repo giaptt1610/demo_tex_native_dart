@@ -32,7 +32,10 @@ class WebHttpClient {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to get data: ${response.statusCode}');
+      throw ApiException(
+        'Failed to get data: ${response.statusCode}',
+        data: jsonDecode(response.body),
+      );
     }
     return response;
   }
@@ -48,8 +51,21 @@ class WebHttpClient {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to post data: ${response.statusCode}');
+      throw ApiException(
+        'Failed to post data: ${response.statusCode}',
+        data: jsonDecode(response.body),
+      );
     }
     return response;
   }
+}
+
+class ApiException implements Exception {
+  final String message;
+  final Map<String, dynamic> data;
+
+  ApiException(this.message, {this.data = const {}});
+
+  @override
+  String toString() => 'ApiException: $message';
 }

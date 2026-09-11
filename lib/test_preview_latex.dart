@@ -1,5 +1,6 @@
 import 'package:demo_tex_native/injector.dart';
 import 'package:demo_tex_native/ocr_service.dart';
+import 'package:demo_tex_native/web_http_client.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'markdown_to_html.dart';
@@ -46,6 +47,8 @@ class _PreviewLatexState extends State<PreviewLatex> {
   Rx<int> sourceId = Rx<int>(0);
   Rx<SourcePreviewResult?> sourcePreviewResult = Rx<SourcePreviewResult?>(null);
   RxBool loading = true.obs;
+  RxBool aladanh = false.obs;
+  Rx<String?> error = Rx(null);
 
   @override
   void initState() {
@@ -82,11 +85,41 @@ class _PreviewLatexState extends State<PreviewLatex> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      sourceId.value = int.tryParse(inputController.text.trim()) ?? 0; // Reset the sourceId before fetching new preview
+                      sourceId.value = int.tryParse(inputController.text.trim()) ?? 0;
                       getSourcePreview();
                     },
                     child: Text('View'),
                   ),
+                  ElevatedButton(
+                    onPressed: () {
+                      sourceId.value = 25324229;
+                      getSourcePreview();
+                    },
+                    child: Text('Toán'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      sourceId.value = 25554575;
+                      getSourcePreview();
+                    },
+                    child: Text('Lý'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      sourceId.value = 25471965;
+                      getSourcePreview();
+                    },
+                    child: Text('Hóa'),
+                  ),
+                  Spacer(),
+                  Obx(() {
+                    return Checkbox(
+                      value: aladanh.value,
+                      onChanged: (value) {
+                        aladanh.value = value ?? false;
+                      },
+                    );
+                  }),
                 ],
               ),
             ),
@@ -96,11 +129,20 @@ class _PreviewLatexState extends State<PreviewLatex> {
                 if (loading.value) {
                   return Center(child: CircularProgressIndicator());
                 }
+                if (error.value != null) {
+                  return Text(
+                    'Error: ${error.value}',
+                    style: TextStyle(color: Colors.red),
+                  );
+                }
                 final result = sourcePreviewResult.value;
                 if (result == null) {
                   return Text('No preview available');
                 }
-                return SingleChildScrollView(child: _markdownItem(result.rawMarkdown));
+
+                return SingleChildScrollView(
+                  child: _markdownItem(result.rawMarkdown),
+                );
               }),
             ),
           ],
@@ -115,12 +157,18 @@ class _PreviewLatexState extends State<PreviewLatex> {
         return;
       }
       loading.value = true;
+      error.value = null;
+
       final result = await getIt.get<OCRService>().fetchSourcePreviewV2(
         sourceId: sourceId.value,
+        aladanh: aladanh.value,
       );
+      print('--- getSourcePreview for source:${sourceId.value} ');
       sourcePreviewResult.value = result;
-    } catch (e) {
-      print('Error fetching source preview: $e');
+    } on ApiException catch (e) {
+      print('--- Error fetching source preview: ${e.runtimeType}');
+      error.value = e.data['message'] ?? 'Unknown error';
+      loading.value = false;
     } finally {
       loading.value = false;
     }
@@ -128,18 +176,19 @@ class _PreviewLatexState extends State<PreviewLatex> {
 
   Widget _markdownItem(String? rawMarkdown) {
     final html = convertMarkdownToHtmlLatex(rawMarkdown ?? '');
-    print('--- html:$html ');
     return HtmlLatex(
       html,
       style: TextStyle(
         fontSize: 16.0,
       ),
-      mathJaxSupported: true,
-
+      mathJaxSupported: false,
       enableFallback: true,
-      config: LatexHtmlWidgetFactoryConfig(
-        baseFontSize: 16.0,
-      ),
+      // config: LatexHtmlWidgetFactoryConfig(
+      //   baseFontSize: 16.0,
+      // ),
+      fallbackScaleInline: 0.84,
+      fallbackScaleBlock: 0.90,
+      fallbackVerticalPadding: 1.5,
     );
   }
 }

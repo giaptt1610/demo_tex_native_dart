@@ -157,7 +157,6 @@ class _MathWidgetBuilder {
         }
 
         final mathOptions = MathOptions(
-          sizeUnderTextStyle: MathSize.large,
           style: displayMode ? MathStyle.display : MathStyle.text,
           color: color,
           fontSize: fontSize,

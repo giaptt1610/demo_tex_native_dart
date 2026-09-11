@@ -100,6 +100,7 @@ class HtmlLatex extends StatelessWidget {
     return HtmlWidget(
       data,
       factoryBuilder: () => LatexHtmlWidgetFactory(config: mergedConfig),
+      textStyle: style,
     );
   }
 

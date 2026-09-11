@@ -3,16 +3,24 @@ import 'package:http/http.dart' as http;
 
 class WebHttpClient {
   final http.Client _client;
-  final String token;
+  String token;
 
   WebHttpClient(
     this._client, {
     required this.token,
   });
 
-  Map<String, String> get _headers => {
+  void setToken(String newToken) {
+    token = newToken;
+    _headers.addAll({'Authorization': 'Bearer $token'});
+  }
+
+  void setHeaders(Map<String, String> headers) {
+    _headers.addAll(headers);
+  }
+
+  final Map<String, String> _headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer $token',
   };
 
   Future<http.Response> get({

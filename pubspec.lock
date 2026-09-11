@@ -197,29 +197,12 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
-  flutter_markdown_plus:
-    dependency: transitive
-    description:
-      name: flutter_markdown_plus
-      sha256: fce641d6c2106cc495de1cd603f97a4f9d615a97a64011928ded380dbdade935
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.12"
-  flutter_markdown_plus_latex:
-    dependency: "direct main"
-    description:
-      name: flutter_markdown_plus_latex
-      sha256: "2e7698b291f0657ca445efab730bb25a8c5851037e882cb7bf47d16a5c218de7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.5"
   flutter_math_fork:
     dependency: transitive
     description:
-      name: flutter_math_fork
-      sha256: "6d5f2f1aa57ae539ffb0a04bb39d2da67af74601d685a161aff7ce5bda5fa407"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/flutter_html_latex-0.1.0+1/packages/flutter_math_fork-0.7.4"
+      relative: true
+    source: path
     version: "0.7.4"
   flutter_svg:
     dependency: transitive
@@ -235,12 +218,11 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_tex:
-    dependency: "direct main"
+    dependency: transitive
     description:
-      name: flutter_tex
-      sha256: "85663250e0170d572c4f9eac4f8e074ce66f7f2f17a8e8c092ca3e862641373f"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/flutter_html_latex-0.1.0+1/packages/flutter_tex-5.2.7"
+      relative: true
+    source: path
     version: "5.2.7"
   flutter_web_plugins:
     dependency: transitive
@@ -248,12 +230,11 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_widget_from_html_core:
-    dependency: "direct main"
+    dependency: transitive
     description:
-      name: flutter_widget_from_html_core
-      sha256: "530f2e3cc57be1a00f8bfae1b0000064e8a6df0cf1fb4d48a80f85afde9b39b7"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/flutter_html_latex-0.1.0+1/packages/flutter_widget_from_html_core-0.17.4"
+      relative: true
+    source: path
     version: "0.17.4"
   freezed:
     dependency: "direct dev"

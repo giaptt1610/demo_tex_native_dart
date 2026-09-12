@@ -22,6 +22,7 @@ class WebHttpClient {
   final Map<String, String> _headers = {
     'Content-Type': 'application/json',
   };
+  Map<String, String> get headers => _headers;
 
   Future<http.Response> get({
     required Uri uri,

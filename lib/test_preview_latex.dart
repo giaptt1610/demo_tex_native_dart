@@ -1,8 +1,9 @@
-import 'package:demo_tex_native/injector.dart';
-import 'package:demo_tex_native/ocr_service.dart';
-import 'package:demo_tex_native/web_http_client.dart';
+import 'package:demo_tex_native/core/config/injector.dart';
+import 'package:demo_tex_native/services/ocr_service.dart';
+import 'package:demo_tex_native/core/http/web_http_client.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'core/config/global_config.dart';
 import 'markdown_to_html.dart';
 import 'models/source_preview_result.dart';
 import 'package:flutter_html_latex/flutter_html_latex.dart';
@@ -51,7 +52,8 @@ class _PreviewLatexState extends State<PreviewLatex> {
   Rx<int> sourceId = Rx<int>(0);
   Rx<SourcePreviewResult?> sourcePreviewResult = Rx<SourcePreviewResult?>(null);
   RxBool loading = true.obs;
-  RxBool aladanh = false.obs;
+  final globalConfig = getIt.get<GlobalConfig>();
+
   Rx<String?> error = Rx(null);
 
   @override
@@ -89,8 +91,7 @@ class _PreviewLatexState extends State<PreviewLatex> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      sourceId.value =
-                          int.tryParse(inputController.text.trim()) ?? 0;
+                      sourceId.value = int.tryParse(inputController.text.trim()) ?? 0;
                       getSourcePreview();
                     },
                     child: Text('View'),
@@ -119,9 +120,9 @@ class _PreviewLatexState extends State<PreviewLatex> {
                   Spacer(),
                   Obx(() {
                     return Checkbox(
-                      value: aladanh.value,
+                      value: globalConfig.aladanh.value,
                       onChanged: (value) {
-                        aladanh.value = value ?? false;
+                        globalConfig.aladanh.value = value ?? false;
                       },
                     );
                   }),
@@ -166,7 +167,7 @@ class _PreviewLatexState extends State<PreviewLatex> {
 
       final result = await getIt.get<OCRService>().fetchSourcePreviewV2(
         sourceId: sourceId.value,
-        aladanh: aladanh.value,
+        aladanh: globalConfig.aladanh.value,
       );
       print('--- getSourcePreview for source:${sourceId.value} ');
       sourcePreviewResult.value = result;
